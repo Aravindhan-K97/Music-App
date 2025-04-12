@@ -11,11 +11,7 @@ dotenv.config();
 
 const app = express();
 app.use(express.json());
-app.use(cors({
-	origin: ["https://music-app61.netlify.app"], // update this when deployed
-	credentials: true
-  }));
-  
+app.use(cors());
 
 connectDb();
 
