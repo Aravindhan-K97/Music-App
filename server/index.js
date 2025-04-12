@@ -10,18 +10,28 @@ import { playlistRouter } from "./routes/playlistRoutes.js";
 dotenv.config();
 
 const app = express();
-app.use(express.json());
-app.use(cors());
 
+// CORS Configuration
+const corsOptions = {
+  origin: "https://music-app61.netlify.app", // Specify the frontend origin
+  credentials: true, 
+  methods: ["GET"],
+};
+
+app.use(express.json());
+app.use(cors(corsOptions)); // Apply CORS with options
+
+// Connect to database
 connectDb();
 
+// Define API routes
 app.use("/api/songs/", songsRouter);
 app.use("/api/users/", userRouter);
 app.use("/api/artistes/", artisteRouter);
 app.use("/api/playlists/", playlistRouter);
 
+// Start the server
 const port = process.env.PORT || 6000;
-
 app.listen(port, async () => {
-	console.log(`SERVER RUNNING ON PORT ${port}`);
+  console.log(`SERVER RUNNING ON PORT ${port}`);
 });
