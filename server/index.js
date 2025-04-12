@@ -6,9 +6,6 @@ import { songsRouter } from "./routes/songRoutes.js";
 import { userRouter } from "./routes/userRoutes.js";
 import { artisteRouter } from "./routes/artisteRoutes.js";
 import { playlistRouter } from "./routes/playlistRoutes.js";
-import { artistes, songs } from "./data.js";
-import Song from "./models/Song.js";
-import Artiste from "./models/Artiste.js";
 
 
 dotenv.config();
@@ -19,6 +16,7 @@ const app = express();
 const corsOptions = {
   origin: "https://music-app61.netlify.app", // Specify the frontend origin
   credentials: true, 
+  methods: ["GET"],
 };
 
 app.use(express.json());
@@ -27,27 +25,11 @@ app.use(cors(corsOptions)); // Apply CORS with options
 // Connect to database
 connectDb();
 
-const newSongs = songs.map((song) => {
-		return {
-			...song,
-			likes: {},
- 	};
- });
-
-
-
 // Define API routes
 app.use("/api/songs/", songsRouter);
 app.use("/api/users/", userRouter);
 app.use("/api/artistes/", artisteRouter);
 app.use("/api/playlists/", playlistRouter);
-
-const songs = Song.find();
-const artistes = Artiste.find();
-  await songs.deleteMany();
-   await artistes.deleteMany();
-  Artiste.insertMany(artistes);
- 	Song.insertMany(newSongs);
 
 // Start the server
 const port = process.env.PORT || 6000;
