@@ -12,7 +12,7 @@ dotenv.config();
 const app = express();
 app.use(express.json());
 app.use(cors({
-	origin: ["http://localhost:5173"], // update this when deployed
+	origin: ["https://music-app61.netlify.app"], // update this when deployed
 	credentials: true
   }));
   
