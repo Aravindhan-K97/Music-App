@@ -1,23 +1,43 @@
 import Song from "../models/Song.js";
 import User from "../models/User.js";
 
-//@desc Get all the songs
-//@route GET /api/songs
-//@access public
+// Get all songs
 const getSongs = async (req, res) => {
 	const songs = await Song.find({});
-
 	if (!songs) {
-		return res.status(400).json({ message: "An error occured!" });
+		return res.status(400).json({ message: "An error occurred!" });
 	}
 	const shuffledSongs = songs.sort(() => (Math.random() > 0.5 ? 1 : -1));
-
 	res.status(200).json(shuffledSongs);
 };
 
-//@desc Get the top songs
-//@route GET /api/songs/top
-//@access public
+// Add a new song
+const addSong = async (req, res) => {
+	try {
+		const { title, duration, coverImage, artistes, artistIds, songUrl, type } = req.body;
+
+		if (!title || !duration || !songUrl) {
+			return res.status(400).json({ message: "Title, duration and song URL are required." });
+		}
+
+		const newSong = new Song({
+			title,
+			duration,
+			coverImage,
+			artistes,
+			artistIds,
+			songUrl,
+			type,
+		});
+
+		const savedSong = await newSong.save();
+		res.status(201).json(savedSong);
+	} catch (error) {
+		res.status(500).json({ message: error.message });
+	}
+};
+
+// Other existing controllers...
 const getTopSongs = async (req, res) => {
 	try {
 		const results = await Song.aggregate([
@@ -30,11 +50,7 @@ const getTopSongs = async (req, res) => {
 					songUrl: 1,
 					artistIds: 1,
 					type: 1,
-					likes: {
-						$size: {
-							$objectToArray: "$likes",
-						},
-					},
+					likes: { $size: { $objectToArray: "$likes" } },
 				},
 			},
 			{ $sort: { likes: -1 } },
@@ -46,45 +62,27 @@ const getTopSongs = async (req, res) => {
 	}
 };
 
-//@desc Get the new releases
-//@route GET /api/songs/releases
-//@access public
 const getNewReleases = async (req, res) => {
 	const songs = await Song.find({});
-
 	const result = songs.slice(-11, -1);
 	const shuffledSongs = result.sort(() => (Math.random() > 0.5 ? 1 : -1));
-
 	res.status(200).json(shuffledSongs);
 };
 
-//@desc Get random songs
-//@route GET /api/songs/random
-//@access public
 const getRandom = async (req, res) => {
 	const songs = await Song.find({});
-
 	const shuffledSongs = songs.sort(() => (Math.random() > 0.5 ? 1 : -1));
 	const result = shuffledSongs.slice(-11, -1);
-
 	res.status(200).json(result);
 };
 
-//@desc Get the popular songs around you
-//@route GET /api/songs/popular
-//@access public
 const getAroundYou = async (req, res) => {
 	const songs = await Song.find({});
-
 	const result = songs.slice(0, 11);
 	const shuffledSongs = result.sort(() => (Math.random() > 0.5 ? 1 : -1));
-
 	res.status(200).json(shuffledSongs);
 };
 
-//@desc Like or unlike a song
-//@route PATCH /api/songs/like/:id
-//@access private
 const likeSong = async (req, res) => {
 	try {
 		const { id } = req.params;
@@ -92,15 +90,11 @@ const likeSong = async (req, res) => {
 		const song = await Song.findById(id);
 		const user = await User.findById(userId);
 
-		if (!user) {
-			return res.json(404).json({ message: "User not found!" });
-		}
-		if (!song) {
-			return res.json(404).json({ message: "Song not found!" });
+		if (!user || !song) {
+			return res.status(404).json({ message: "User or Song not found!" });
 		}
 
 		const isLiked = song.likes.get(userId);
-
 		if (isLiked) {
 			song.likes.delete(userId);
 			user.favorites = user.favorites.filter((songId) => songId !== id);
@@ -111,10 +105,6 @@ const likeSong = async (req, res) => {
 
 		const savedSong = await song.save();
 		const savedUser = await user.save();
-
-		if (!savedSong || !savedUser) {
-			return res.status(400).json({ message: "An error occured" });
-		}
 
 		const returnUser = {
 			id: savedUser.id,
@@ -131,6 +121,7 @@ const likeSong = async (req, res) => {
 
 export {
 	getSongs,
+	addSong,
 	getTopSongs,
 	getNewReleases,
 	getRandom,
