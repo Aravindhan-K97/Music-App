@@ -14,22 +14,41 @@ const HomeLayout = () => {
 	}, [pathname]);
 
 	return (
-		<>
-			<Grid
-				position="relative"
-				templateColumns={{ base: "1fr", md: "repeat(10, 1fr)" }}
-				bg="blackAlpha.900"
-				color="#e3e3e3">
-				<GridItem colSpan={2}>
-					<Navbar />
-				</GridItem>
+		<Grid
+			position="relative"
+			templateColumns={{ base: "1fr", md: "repeat(10, 1fr)" }}
+			bg="blackAlpha.900"
+			color="#e3e3e3"
+			h="100vh">
+			{/* Sidebar (Navbar) */}
+			<GridItem colSpan={{ base: 1, md: 2 }} p={4}>
+				<Navbar />
+			</GridItem>
 
-				<GridItem colSpan={8} minH={{ base: "97vh", md: "100vh" }}>
-					<Outlet />
+			{/* Main Content */}
+			<GridItem
+				colSpan={{ base: 1, md: 8 }}
+				minH="calc(100vh - 60px)" // Ensures content height adjusts without overlapping music player
+				overflowY="auto" // Allows scrolling of content
+				p={{ base: 2, md: 6 }}>
+				<Outlet />
+			</GridItem>
+
+			{/* Music Player */}
+			{currentTrack && (
+				<GridItem
+					colSpan={10}
+					position="absolute"
+					bottom={0}
+					left={0}
+					w="full"
+					bg="zinc.800"
+					borderTop="1px solid #444"
+					zIndex={10}>
+					<MusicPlayer />
 				</GridItem>
-				{currentTrack && <MusicPlayer />}
-			</Grid>
-		</>
+			)}
+		</Grid>
 	);
 };
 

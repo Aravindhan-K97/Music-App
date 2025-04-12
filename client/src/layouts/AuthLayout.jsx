@@ -12,16 +12,23 @@ const AuthLayout = () => {
 		if (user) {
 			navigate("/home");
 		}
-	}, [user]);
+	}, [user, navigate]);
+
 	return (
 		<main>
+			{/* Header */}
 			<Flex
 				align="center"
 				justify="flex-start"
 				bg="zinc.800"
 				p={4}
 				pl={6}
-				h={{ base: "full", md: "5rem" }}>
+				h={{ base: "4rem", md: "5rem" }} // Adjusted for responsiveness
+				position="fixed"
+				top={0}
+				left={0}
+				w="full"
+				zIndex={10}>
 				<Flex align="center" color="accent.main" justify="flex-start" gap={2}>
 					<BiMusic size={30} />
 					<Heading
@@ -32,7 +39,9 @@ const AuthLayout = () => {
 					</Heading>
 				</Flex>
 			</Flex>
-			<Box bg="zinc.950" h="full" minH="91vh">
+
+			{/* Main content */}
+			<Box bg="zinc.950" minH="calc(100vh - 5rem)" pt="5rem"> {/* Adjusted for header spacing */}
 				<Outlet />
 			</Box>
 		</main>
